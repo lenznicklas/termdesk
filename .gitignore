@@ -1,0 +1,34 @@
+# Maven build output
+target/
+
+# Java compiled files
+*.class
+*.jar
+*.war
+*.ear
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Maven wrapper jar is usually committed, but generated files can be ignored if present
+.mvn/timing.properties
+
+# Temporary files
+*.tmp
+*.swp
