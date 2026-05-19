@@ -1,3 +1,5 @@
 package at.lenz.termdesk;
 
-public record AppMenuItem(String label, String command, StartMode mode){}
+import java.util.List;
+
+public record AppMenuItem(String label, List<String> command, StartMode mode) {}
