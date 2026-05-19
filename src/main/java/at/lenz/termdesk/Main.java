@@ -1,7 +1,5 @@
 package at.lenz.termdesk;
 
-import com.googlecode.lanterna.SGR;
-import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
@@ -13,12 +11,15 @@ import java.util.List;
 
 public class Main {
   public static void main(String[] args) throws Exception {
+
     AppMenuItem[] options = {
-      new AppMenuItem("nvim", List.of("nvim"), StartMode.TERM),
-      new AppMenuItem("firefox", List.of("firefox"), StartMode.NWINDOW),
+      new AppMenuItem("nvim", "\uE6AE", List.of("nvim"), StartMode.TERM),
+      new AppMenuItem("firefox", "\uE745", List.of("firefox"), StartMode.NWINDOW),
       new AppMenuItem(
-          "tetris", List.of("python3", "/home/lenz/Projects/tetris.py"), StartMode.TERM),
-      new AppMenuItem("Exit", List.of(""), StartMode.EXIT)
+          "tetris", "\uEC17", List.of("python3", "/home/lenz/Projects/tetris.py"), StartMode.TERM),
+      new AppMenuItem("spotify", "\uF1BC", List.of("spotify_player"), StartMode.TERM),
+      new AppMenuItem("network", "\uF1EB", List.of("nmtui"), StartMode.TERM),
+      new AppMenuItem("Exit", "\uEA6E", List.of(""), StartMode.EXIT)
     };
 
     Terminal terminal = new DefaultTerminalFactory().createTerminal();
@@ -34,28 +35,18 @@ public class Main {
       screen.setCursorPosition(null);
 
       TextGraphics g = screen.newTextGraphics();
+      // makeTitle(txtgraph, title, screen
+      String title = "termDesk | lenz@arch";
 
-      String title = "termDesk";
-
+      Draw.drawHeadline(g, screen, title);
+      /*
       int width = screen.getTerminalSize().getColumns();
       int x = (width - title.length()) / 2;
 
       g.putString(width - 5, 0, Headline.getBattery() + "%");
-      g.putString(x, 0, title);
+      g.putString(x, 0, title);*/
 
-      for (int i = 0; i < options.length; i++) {
-        int y = i + 3;
-
-        if (i == selected) {
-          g.setForegroundColor(TextColor.ANSI.WHITE);
-          g.enableModifiers(SGR.BOLD);
-          g.putString(2, y, ">> " + options[i].label());
-          g.disableModifiers(SGR.BOLD);
-        } else {
-          g.setForegroundColor(TextColor.ANSI.WHITE);
-          g.putString(2, y, "   " + options[i].label());
-        }
-      }
+      Draw.drawRow(options, g, selected, 4);
 
       screen.refresh();
 
@@ -70,12 +61,14 @@ public class Main {
       } else if (key.getKeyType() == KeyType.ArrowDown) {
         selected++;
 
-        if (selected > options.length) {
+        if (selected >= options.length) {
           selected = 0;
         }
       } else if (key.getKeyType() == KeyType.Enter) {
         AppMenuItem item = options[selected];
-
+        if (item.mode() == StartMode.EXIT) {
+          return;
+        }
         Run.runCommand(item);
       }
     }
