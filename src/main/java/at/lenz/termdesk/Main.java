@@ -31,25 +31,22 @@ public class Main {
 
     while (running) {
 
+      // draw TUI
       screen.clear();
       screen.setCursorPosition(null);
 
       TextGraphics g = screen.newTextGraphics();
-      // makeTitle(txtgraph, title, screen
+
       String title = "termDesk | lenz@arch";
 
       Draw.drawHeadline(g, screen, title);
-      /*
-      int width = screen.getTerminalSize().getColumns();
-      int x = (width - title.length()) / 2;
-
-      g.putString(width - 5, 0, Headline.getBattery() + "%");
-      g.putString(x, 0, title);*/
-
       Draw.drawRow(options, g, selected, 4);
+      Draw.drawBoxToBottom(g, screen, 3, 2, 20);
+      Draw.drawFooter(options, g, selected, screen);
 
       screen.refresh();
 
+      // react to input
       KeyStroke key = screen.readInput();
 
       if (key.getKeyType() == KeyType.ArrowUp) {
