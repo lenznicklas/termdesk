@@ -59,7 +59,7 @@ public class Main {
 
       Draw.drawHeadline(g, screen, title);
       Draw.drawRow(options, g, selected, 4);
-      Draw.drawBoxToBottom(g, screen, 3, 3, 20);
+      Draw.drawBox(g, 3, 3, 20, screen.getTerminalSize().getRows() - 6, false);
       Draw.drawFooter(options, g, selected, screen);
 
       screen.refresh();

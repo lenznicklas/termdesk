@@ -52,7 +52,7 @@ public class Draw {
     int width = s.getTerminalSize().getColumns();
     int x = (width - title.length()) / 2;
     g.putString(x, 1, title);
-    drawBox(g, x - 1, 0, title.length() + 1, 2);
+    drawBox(g, x - 1, 0, title.length() + 1, 2, true);
   }
 
   public static void drawTime(TextGraphics g, LocalTime t) {
@@ -61,7 +61,7 @@ public class Draw {
     String ts = "\uF017 " + t.format(formatter);
     int x = 5;
     g.putString(x, 1, ts);
-    drawBox(g, x - 2, 0, ts.length() + 3, 2);
+    drawBox(g, x - 2, 0, ts.length() + 3, 2, true);
   }
 
   public static void drawBattery(TextGraphics g, Screen s) {
@@ -69,7 +69,7 @@ public class Draw {
     g.setForegroundColor(TextColor.ANSI.WHITE);
     int x = s.getTerminalSize().getColumns() - bat.length() - 4;
     g.putString(x, 1, bat);
-    drawBox(g, x - 2, 0, bat.length() + 3, 2);
+    drawBox(g, x - 2, 0, bat.length() + 3, 2, true);
   }
 
   public static void drawLine(TextGraphics g, Screen s, int y) {
@@ -79,33 +79,26 @@ public class Draw {
     }
   }
 
-  public static void drawBoxToBottom(TextGraphics g, Screen s, int x, int y, int width) {
+  public static void drawBox(
+      TextGraphics g, int x, int y, int width, int height, boolean drawBottom) {
     g.setForegroundColor(TextColor.ANSI.WHITE);
-    int height = s.getTerminalSize().getRows() - 3 - y;
 
     g.setCharacter(x, y, Symbols.SINGLE_LINE_TOP_LEFT_CORNER);
     g.setCharacter(x + width, y, Symbols.SINGLE_LINE_TOP_RIGHT_CORNER);
+    if (drawBottom == true) {
+      g.setCharacter(x, y + height, Symbols.SINGLE_LINE_BOTTOM_LEFT_CORNER);
+      g.setCharacter(x + width, y + height, Symbols.SINGLE_LINE_BOTTOM_RIGHT_CORNER);
+      for (int i = 1; i < width; i++) {
+        g.setCharacter(x + i, y + height, Symbols.SINGLE_LINE_HORIZONTAL);
+      }
+    } else {
+      g.setCharacter(x, y + height, Symbols.SINGLE_LINE_VERTICAL);
+      g.setCharacter(x + width, y + height, Symbols.SINGLE_LINE_VERTICAL);
+    }
     for (int i = 1; i < width; i++) {
       g.setCharacter(x + i, y, Symbols.SINGLE_LINE_HORIZONTAL);
     }
     for (int i = 1; i < height; i++) {
-      g.setCharacter(x, y + i, Symbols.SINGLE_LINE_VERTICAL);
-      g.setCharacter(x + width, y + i, Symbols.SINGLE_LINE_VERTICAL);
-    }
-  }
-
-  public static void drawBox(TextGraphics g, int x, int y, int width, int heigth) {
-    g.setForegroundColor(TextColor.ANSI.WHITE);
-
-    g.setCharacter(x, y, Symbols.SINGLE_LINE_TOP_LEFT_CORNER);
-    g.setCharacter(x + width, y, Symbols.SINGLE_LINE_TOP_RIGHT_CORNER);
-    g.setCharacter(x, y + heigth, Symbols.SINGLE_LINE_BOTTOM_LEFT_CORNER);
-    g.setCharacter(x + width, y + heigth, Symbols.SINGLE_LINE_BOTTOM_RIGHT_CORNER);
-    for (int i = 1; i < width; i++) {
-      g.setCharacter(x + i, y, Symbols.SINGLE_LINE_HORIZONTAL);
-      g.setCharacter(x + i, y + heigth, Symbols.SINGLE_LINE_HORIZONTAL);
-    }
-    for (int i = 1; i < heigth; i++) {
       g.setCharacter(x, y + i, Symbols.SINGLE_LINE_VERTICAL);
       g.setCharacter(x + width, y + i, Symbols.SINGLE_LINE_VERTICAL);
     }
