@@ -7,6 +7,7 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import java.time.LocalTime;
 import java.util.List;
 
 public class Main {
@@ -25,49 +26,71 @@ public class Main {
     Terminal terminal = new DefaultTerminalFactory().createTerminal();
     Screen screen = new TerminalScreen(terminal);
     screen.startScreen();
+    LocalTime time = LocalTime.now();
 
     boolean running = true;
     int selected = 0;
+    long lastUpdate = 0;
+
+    int yMatrix = 0;
+
+    int width = screen.getTerminalSize().getColumns();
 
     while (running) {
+      TextGraphics g = screen.newTextGraphics();
+      long now = System.currentTimeMillis();
+
+      if (now - lastUpdate >= 110) {
+        yMatrix++;
+        Matrix.drawMatrix(g, width - 39, 3, yMatrix);
+        time = time.now();
+        Draw.drawTime(g, time);
+        Draw.drawBattery(g, screen);
+        lastUpdate = now;
+      }
+
+      Draw.drawBoxToBottom(g, screen, width - 39, 3, 36);
 
       // draw TUI
-      screen.clear();
+      // screen.clear();
       screen.setCursorPosition(null);
-
-      TextGraphics g = screen.newTextGraphics();
 
       String title = "termDesk | lenz@arch";
 
       Draw.drawHeadline(g, screen, title);
       Draw.drawRow(options, g, selected, 4);
-      Draw.drawBoxToBottom(g, screen, 3, 2, 20);
+      Draw.drawBoxToBottom(g, screen, 3, 3, 20);
       Draw.drawFooter(options, g, selected, screen);
 
       screen.refresh();
 
       // react to input
-      KeyStroke key = screen.readInput();
+      KeyStroke key = screen.pollInput();
+      if (key != null) {
+        if (key.getKeyType() == KeyType.ArrowUp) {
+          Draw.clearArea(g, 4, 3, 18, 20);
+          selected--;
 
-      if (key.getKeyType() == KeyType.ArrowUp) {
-        selected--;
+          if (selected < 0) {
+            selected = options.length - 1;
+          }
+        } else if (key.getKeyType() == KeyType.ArrowDown) {
 
-        if (selected < 0) {
-          selected = options.length - 1;
-        }
-      } else if (key.getKeyType() == KeyType.ArrowDown) {
-        selected++;
+          selected++;
 
-        if (selected >= options.length) {
-          selected = 0;
+          if (selected >= options.length) {
+            selected = 0;
+          }
+        } else if (key.getKeyType() == KeyType.Enter) {
+          AppMenuItem item = options[selected];
+          if (item.mode() == StartMode.EXIT) {
+            return;
+          }
+          Run.runCommand(item);
+          screen.clear();
         }
-      } else if (key.getKeyType() == KeyType.Enter) {
-        AppMenuItem item = options[selected];
-        if (item.mode() == StartMode.EXIT) {
-          return;
-        }
-        Run.runCommand(item);
       }
+      Thread.sleep(30);
     }
   }
 }
