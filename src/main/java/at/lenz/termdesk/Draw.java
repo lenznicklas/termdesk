@@ -9,35 +9,54 @@ import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.Screen;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 public class Draw {
 
-  public static void drawRow(AppMenuItem[] options, TextGraphics g, int selected, int x) {
+  public static int drawRow(AppMenuItem[] options, TextGraphics g, int[] selected, int x, int row) {
+
+    ArrayList<AppMenuItem> rowList = new ArrayList<>();
     for (int i = 0; i < options.length; i++) {
-      int y = i + 4;
-      // TODO: dynamisch machen
-      clearArea(g, x, y, 18, 20);
-      if (i == selected) {
-        g.setForegroundColor(TextColor.ANSI.WHITE);
-        g.enableModifiers(SGR.BOLD);
-        g.putString(x, y, ">> " + options[i].icon() + "  " + options[i].label());
-        g.disableModifiers(SGR.BOLD);
-      } else {
-        g.setForegroundColor(TextColor.ANSI.WHITE);
-        g.putString(x, y, "   " + options[i].label());
+      if (options[i].row() == row) {
+        rowList.add(options[i]);
       }
     }
+
+    for (int i = 0; i < rowList.size(); i++) {
+      if (rowList.get(i).row() == row) {
+        int y = i + 4;
+        // TODO: dynamisch machen
+        clearArea(g, x, y, 18, 20);
+        if (i == selected[1] && selected[0] == row) {
+          g.setForegroundColor(TextColor.ANSI.WHITE);
+          g.enableModifiers(SGR.BOLD);
+          g.putString(x, y, ">> " + rowList.get(i).icon() + "  " + rowList.get(i).label());
+          g.disableModifiers(SGR.BOLD);
+        } else {
+          g.setForegroundColor(TextColor.ANSI.WHITE);
+          g.putString(x, y, "   " + rowList.get(i).label());
+        }
+      }
+    }
+    int cnt = rowList.size();
+
+    return cnt;
   }
 
-  public static void drawFooter(AppMenuItem[] options, TextGraphics g, int selected, Screen s) {
+  public static void drawFooter(AppMenuItem[] options, TextGraphics g, int[] selected, Screen s) {
     int height = s.getTerminalSize().getRows();
     int width = s.getTerminalSize().getColumns();
-
+    ArrayList<AppMenuItem> rowList = new ArrayList<>();
+    for (int i = 0; i < options.length; i++) {
+      if (options[i].row() == selected[0]) {
+        rowList.add(options[i]);
+      }
+    }
     int y = height - 2;
 
     clearArea(g, 0, y, width, 1);
 
-    String text = String.join(" ", options[selected].command());
+    String text = String.join(" ", rowList.get(selected[1]).command());
 
     int x = width - text.length() - 5;
     drawLine(g, s, y + 1);
@@ -45,7 +64,7 @@ public class Draw {
     g.putString(x, y, text);
 
     x = 2;
-    g.putString(x, y, options[selected].icon());
+    g.putString(x, y, rowList.get(selected[1]).icon());
   }
 
   public static void drawHeadline(TextGraphics g, Screen s, LocalTime t, String title) {

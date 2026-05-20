@@ -14,14 +14,19 @@ public class Main {
   public static void main(String[] args) throws Exception {
 
     AppMenuItem[] options = {
-      new AppMenuItem("nvim", "\uE6AE", List.of("nvim"), StartMode.TERM),
-      new AppMenuItem("hyprland", "", List.of("start-hyprland"), StartMode.WM),
-      new AppMenuItem("firefox", "\uE745", List.of("firefox"), StartMode.NWINDOW),
+      new AppMenuItem("nvim", "\uE6AE", List.of("nvim"), StartMode.TERM, 0),
+      new AppMenuItem("firefox", "\uE745", List.of("firefox"), StartMode.NWINDOW, 0),
       new AppMenuItem(
-          "tetris", "\uEC17", List.of("python3", "/home/lenz/Projects/tetris.py"), StartMode.TERM),
-      new AppMenuItem("spotify", "\uF1BC", List.of("spotify_player"), StartMode.TERM),
-      new AppMenuItem("network", "\uF1EB", List.of("nmtui"), StartMode.TERM),
-      new AppMenuItem("Exit", "\uEA6E", List.of(""), StartMode.EXIT)
+          "tetris",
+          "\uEC17",
+          List.of("python3", "/home/lenz/Projects/tetris.py"),
+          StartMode.TERM,
+          0),
+      new AppMenuItem("spotify", "\uF1BC", List.of("spotify_player"), StartMode.TERM, 0),
+      new AppMenuItem("network", "\uF1EB", List.of("nmtui"), StartMode.TERM, 0),
+      new AppMenuItem("Exit", "\uEA6E", List.of(""), StartMode.EXIT, 0),
+      new AppMenuItem("hyprland", "\uF359", List.of("start-hyprland"), StartMode.WM, 1),
+      new AppMenuItem("libreoffice", "L", List.of("libreoffice"), StartMode.NWINDOW, 1)
     };
 
     Terminal terminal = new DefaultTerminalFactory().createTerminal();
@@ -30,16 +35,21 @@ public class Main {
     LocalTime time = LocalTime.now();
 
     boolean running = true;
-    int selected = 0;
+    int[] selected = {0, 0};
     long lastUpdate = 0;
 
     int yMatrix = 0;
 
     int width = screen.getTerminalSize().getColumns();
+    int cntRows = 1;
 
     String title = "termdesk | lenz@arch";
     // TODO: if terminalsize != terminalsize reload
+
+    int[] rows = {0, 0};
+
     while (running) {
+
       TextGraphics g = screen.newTextGraphics();
       long now = System.currentTimeMillis();
 
@@ -54,12 +64,13 @@ public class Main {
       screen.setCursorPosition(null);
 
       Draw.drawBox(g, width - 39, 3, 36, screen.getTerminalSize().getRows() - 6, false);
-      Draw.drawRow(options, g, selected, 4);
+      int row1 = Draw.drawRow(options, g, selected, 4, 0);
+      rows[0] = row1;
       Draw.drawBox(g, 3, 3, 20, screen.getTerminalSize().getRows() - 6, false);
       Draw.drawFooter(options, g, selected, screen);
 
-      Draw.drawRow(options, g, selected, 40);
-
+      int row2 = Draw.drawRow(options, g, selected, 40, 1);
+      rows[1] = row2;
       screen.refresh();
 
       // react to input
@@ -67,20 +78,30 @@ public class Main {
       if (key != null) {
         if (key.getKeyType() == KeyType.ArrowUp) {
           Draw.clearArea(g, 4, 3, 18, 20);
-          selected--;
+          selected[1]--;
+          int len = rows[selected[0]];
 
-          if (selected < 0) {
-            selected = options.length - 1;
+          if (selected[1] < 0) {
+            selected[1] = len - 1;
           }
         } else if (key.getKeyType() == KeyType.ArrowDown) {
 
-          selected++;
+          selected[1]++;
+          int len = rows[selected[0]];
 
-          if (selected >= options.length) {
-            selected = 0;
+          if (selected[1] >= len) {
+            selected[1] = 0;
           }
+        } else if (key.getKeyType() == KeyType.Tab) {
+          selected[0]++;
+          selected[1] = 0;
+
+          if (selected[0] > cntRows) {
+            selected[0] = 0;
+          }
+
         } else if (key.getKeyType() == KeyType.Enter) {
-          AppMenuItem item = options[selected];
+          AppMenuItem item = options[selected[1]];
           if (item.mode() == StartMode.EXIT) {
             return;
           }
