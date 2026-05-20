@@ -48,28 +48,23 @@ public class Draw {
     g.putString(x, y, options[selected].icon());
   }
 
-  public static void drawHeadline(TextGraphics g, Screen s, String title) {
+  public static void drawHeadline(TextGraphics g, Screen s, LocalTime t, String title) {
+    g.setForegroundColor(TextColor.ANSI.WHITE);
+
     int width = s.getTerminalSize().getColumns();
-    int x = (width - title.length()) / 2;
-    g.putString(x, 1, title);
-    drawBox(g, x - 1, 0, title.length() + 1, 2, true);
-  }
-
-  public static void drawTime(TextGraphics g, LocalTime t) {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-    g.setForegroundColor(TextColor.ANSI.WHITE);
-    String ts = "\uF017 " + t.format(formatter);
-    int x = 5;
-    g.putString(x, 1, ts);
-    drawBox(g, x - 2, 0, ts.length() + 3, 2, true);
-  }
+    String time = "\uF017 " + t.format(formatter);
+    String bat = "\uF240 " + Battery.getBattery();
+    int[] x = {5, (width - title.length()) / 2, width - bat.length() - 4};
+    int y = 1;
 
-  public static void drawBattery(TextGraphics g, Screen s) {
-    String bat = "\uF240 " + Headline.getBattery();
-    g.setForegroundColor(TextColor.ANSI.WHITE);
-    int x = s.getTerminalSize().getColumns() - bat.length() - 4;
-    g.putString(x, 1, bat);
-    drawBox(g, x - 2, 0, bat.length() + 3, 2, true);
+    g.putString(x[0], y, time);
+    g.putString(x[1], y, title);
+    g.putString(x[2], y, bat);
+
+    drawBox(g, x[0] - 2, 0, time.length() + 3, 2, true);
+    drawBox(g, x[1] - 2, 0, title.length() + 3, 2, true);
+    drawBox(g, x[2] - 2, 0, bat.length() + 3, 2, true);
   }
 
   public static void drawLine(TextGraphics g, Screen s, int y) {

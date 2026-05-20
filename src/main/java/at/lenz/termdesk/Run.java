@@ -15,6 +15,9 @@ public class Run {
     } else if (mode == StartMode.TERM) {
       pb.inheritIO();
       pb.start().waitFor();
+    } else if (mode == StartMode.WM) {
+      pb.start();
+      return;
     } else if (mode == StartMode.EXIT) {
       return;
     }

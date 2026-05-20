@@ -15,6 +15,7 @@ public class Main {
 
     AppMenuItem[] options = {
       new AppMenuItem("nvim", "\uE6AE", List.of("nvim"), StartMode.TERM),
+      new AppMenuItem("hyprland", "", List.of("start-hyprland"), StartMode.WM),
       new AppMenuItem("firefox", "\uE745", List.of("firefox"), StartMode.NWINDOW),
       new AppMenuItem(
           "tetris", "\uEC17", List.of("python3", "/home/lenz/Projects/tetris.py"), StartMode.TERM),
@@ -36,6 +37,8 @@ public class Main {
 
     int width = screen.getTerminalSize().getColumns();
 
+    String title = "termdesk | lenz@arch";
+    // TODO: if terminalsize != terminalsize reload
     while (running) {
       TextGraphics g = screen.newTextGraphics();
       long now = System.currentTimeMillis();
@@ -44,23 +47,18 @@ public class Main {
         yMatrix++;
         Matrix.drawMatrix(g, width - 39, 3, yMatrix);
         time = time.now();
-        Draw.drawTime(g, time);
-        Draw.drawBattery(g, screen);
+        Draw.drawHeadline(g, screen, time, title);
         lastUpdate = now;
       }
 
-      Draw.drawBoxToBottom(g, screen, width - 39, 3, 36);
-
-      // draw TUI
-      // screen.clear();
       screen.setCursorPosition(null);
 
-      String title = "termDesk | lenz@arch";
-
-      Draw.drawHeadline(g, screen, title);
+      Draw.drawBox(g, width - 39, 3, 36, screen.getTerminalSize().getRows() - 6, false);
       Draw.drawRow(options, g, selected, 4);
       Draw.drawBox(g, 3, 3, 20, screen.getTerminalSize().getRows() - 6, false);
       Draw.drawFooter(options, g, selected, screen);
+
+      Draw.drawRow(options, g, selected, 40);
 
       screen.refresh();
 
