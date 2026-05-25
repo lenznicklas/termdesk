@@ -6,7 +6,8 @@ import java.util.List;
 
 public class KeyAction {
 
-  public static void keyAction(KeyStroke key, int[] selected, List<Integer> possible) {
+  public static void keyAction(KeyStroke key, int[] selected, List<Integer> possible, Config config)
+      throws Exception {
     if (key != null) {
       // [0] col; [1] row
       if (key.getKeyType() == KeyType.ArrowDown) {
@@ -41,6 +42,21 @@ public class KeyAction {
 
         if (selected[0] == -1) {
           selected[0] = size - 1;
+        }
+
+      } else if (key.getKeyType() == KeyType.Enter) {
+        AppMenuItem selectedAmi;
+        for (Column c : config.cols()) {
+          if (c.isAppColumn()) {
+            for (AppMenuItem ami : c.apps()) {
+
+              if (ami.column() == selected[0] && ami.row() == selected[1]) {
+
+                Run.runCommand(ami);
+                break;
+              }
+            }
+          }
         }
 
       } else if (key.getKeyType() == KeyType.Escape) {

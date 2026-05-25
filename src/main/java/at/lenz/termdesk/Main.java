@@ -48,7 +48,7 @@ public class Main {
 
       KeyStroke key = screen.pollInput();
 
-      KeyAction.keyAction(key, selected, possible);
+      KeyAction.keyAction(key, selected, possible, config);
 
       screen.refresh();
       Thread.sleep(30);
