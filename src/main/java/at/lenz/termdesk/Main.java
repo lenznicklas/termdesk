@@ -32,9 +32,17 @@ public class Main {
     List<Integer> possible = new ArrayList<>();
     fillPossible(config, possible);
 
+    TextGraphics g = screen.newTextGraphics();
+
+    // Static draws
+
+    // Draw.drawFooterOutline(g, screen);
+    screen.refresh(Screen.RefreshType.DELTA);
+
+    // loop
     while (running) {
 
-      TextGraphics g = screen.newTextGraphics();
+      // TextGraphics g = screen.newTextGraphics();
       screen.clear();
       screen.setCursorPosition(null);
 
@@ -42,9 +50,11 @@ public class Main {
 
         if (col.isAppColumn()) {
 
-          Draw.drawCol(col, g, selected);
+          Draw.drawCol(col, g, screen, selected);
         }
       }
+
+      Draw.drawFooterOutline(g, screen);
 
       KeyStroke key = screen.pollInput();
 
