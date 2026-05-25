@@ -7,8 +7,16 @@ import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
+  public static void fillPossible(Config config, List<Integer> possible) {
+    for (Column col : config.cols()) {
+      possible.add(col.apps().size());
+    }
+  }
+
   public static void main(String[] args) throws Exception {
 
     Config config = ConfigUtil.load(Path.of("/home/lenz/.config/termdesk/config.tdc"));
@@ -21,6 +29,8 @@ public class Main {
     boolean running = true;
 
     int[] selected = {0, 0};
+    List<Integer> possible = new ArrayList<>();
+    fillPossible(config, possible);
 
     while (running) {
 
@@ -38,7 +48,7 @@ public class Main {
 
       KeyStroke key = screen.pollInput();
 
-      KeyAction.keyAction(key, selected);
+      KeyAction.keyAction(key, selected, possible);
 
       screen.refresh();
       Thread.sleep(30);
